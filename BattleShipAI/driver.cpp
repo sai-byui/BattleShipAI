@@ -30,21 +30,24 @@ int main()
     {
         //cout<<"Starting turn p1\n";
         p1->turn(*p2);
-        //cout<<"Done:\nStarting turn p2\n";
-        p2->turn(*p1);
-        //cout<<"Done:\n";
+        // Check if player one hit the last ship
         if (!p2->ships_left())
         {
-            cout<<"\n\nPlayer Wins!!!\n";
+            cout<<"\n\nPlayer One Wins!!!\n";
             done = true;
             continue;
         }
-        else if (!p2->ships_left())
+        //cout<<"Done:\nStarting turn p2\n";
+        p2->turn(*p1);
+        // Check if player two hit the last ship
+        if (!p1->ships_left())
         {
-            cout<<"\n\nComputer Wins!!!\n";
+            cout<<"\n\nPlayer Two Wins!!!\n";
             done = true;
             continue;
         }
+        //cout<<"Done:\n";
+
         p1->render_board();
     }
     
