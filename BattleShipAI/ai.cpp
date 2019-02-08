@@ -5,15 +5,26 @@
 #include <time.h>
 using namespace std;
 
+class Point {
+	public: 
+		void set(int x, int y) { this->x = x; this->y = y; }
+	
+	int x;
+	int y;
+};
+
+
 void ComputerPlayer::turn(Player &target)
 {
-  enum STATE{RAND, CHECK, FOLLOW};
+  enum STATE{RAND, CHECK, FOLLOW, FOLLOW2};
   
     static STATE state = RAND;
   
     static int lastx = 0;
     static int lasty = 0;
     static int hitstreak = 0;
+	static Point firstHit;
+
     
     int x,y;
     
@@ -31,6 +42,9 @@ void ComputerPlayer::turn(Player &target)
             {
                 lastx = x;
                 lasty = y;
+
+				firstHit.set(x, y);
+
                 state = CHECK;
             }
           break;
@@ -82,12 +96,46 @@ void ComputerPlayer::turn(Player &target)
                 }
                 // This is so we don't keep going if the next spot in the grid is already marked
                 if (target.map[x][y]==MISS || target.map[x][y]==HIT){
-                    state = RAND;
+                    state = FOLLOW2;
                     continue;
                 }
            if (target.map[x][y]==BLANK)
-             state = RAND;
+             state = FOLLOW2;
           break;
+
+		case FOLLOW2:
+			direction = (direction + 2) % 4;
+			lastx = firstHit.x;
+			lasty = firstHit.y;
+
+			switch (direction)
+			{
+			case 0: // south
+				x = lastx;
+				y = ++lasty;
+				break;
+			case 1: //east
+				x = ++lastx;
+				y = lasty;
+				break;
+			case 2: // north
+				x = lastx;
+				y = --lasty;
+				break;
+			case 3: // west
+				x = --lastx;
+				y = lasty;
+				break;
+			}
+			if (target.map[x][y]==MISS || target.map[x][y]==HIT){
+                    state = RAND;
+                    continue;
+                }
+
+			if (target.map[x][y] == BLANK)
+				state = RAND;
+
+			break;
         }
         
         if (x < 0 || x >= BOARDX || y < 0 || y >= BOARDY)

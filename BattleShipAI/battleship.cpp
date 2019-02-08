@@ -166,10 +166,23 @@ void HumanPlayer::turn(Player &target)
 {
     int x, y;
     
-    cout<<"x = ";
-    cin>>x;
-    cout<<"y = ";
-    cin>>y;
+    do{
+        cout<<"x = ";
+        cin>>x;
+        if (x < 0 || x > BOARDX){
+            cout<<"\n\""<<x<<"\" is not a valid tile!\n"
+        }
+        else break;
+    }while(true);
+    
+    do{
+        cout<<"y = ";
+        cin>>y;
+        if (y < 0 || y > BOARDX){
+            cout<<"\n\""<<y<<"\" is not a valid tile!\n"
+        }
+        else break;
+    }while(true);
     x--;
     y--;
     cout<<"\n\n";
