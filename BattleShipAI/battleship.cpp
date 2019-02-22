@@ -119,8 +119,15 @@ bool Player::ships_left()
 
 void Player::render_map(int map[BOARDX][BOARDY])
 {
+    cout<<"   ";
+    for (int k=0; k<BOARDX; k++){
+        cout<<k+1<<"  ";
+    }
+    cout<<endl;
+    
     for (int i=0; i<BOARDY; i++)
     {
+        cout<<i+1<<' ';
         for (int j=0; j<BOARDX; j++)
         {
             cout<<"[";
@@ -152,6 +159,7 @@ void Player::render_board()
 {
     render_map(hit_map);
     
+    cout<<"--";
     for (int i=0; i<BOARDX; i++)
     {
         cout<<"---";

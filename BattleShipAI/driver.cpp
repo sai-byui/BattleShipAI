@@ -19,7 +19,7 @@ int main()
     
     //Allocate players
     Player *p1 = new HumanPlayer();
-    Player *p2 = new ComputerPlayer();
+    Player *p2 = new SliceAndDice();
     
     render_logo();
     

@@ -6,6 +6,46 @@
 using namespace std;
 
 
+void SliceAndDice::turn(Player &target){
+    int x, y;
+    static bool lastHit = false;
+    
+    
+    do{
+        // Code
+        if (hitlist.size() > 0){
+            x = hitlist.front().x;
+            y = hitlist.front().y;
+            hitlist.pop();
+        }
+        
+        // Check for valid
+        if (x < 0 || x >= BOARDX || y < 0 || y >= BOARDY)
+            continue;
+        if (target.map[x][y] == HIT || target.map[x][y] == MISS) {continue;}
+        else if (target.map[x][y] == SHIP)
+        {
+            cout<<"\nThe computer hit your battleship! ("<<x<<','<<y<<")\n";
+            target.map[x][y] = HIT;
+            hit_map[x][y] = HIT;
+            lastHit = true;
+            runLoop = false;
+        }
+        else if (target.map[x][y] == BLANK)
+        {
+            cout<<"\nThe computer missed! ("<<x<<','<<y<<")\n";
+            target.map[x][y] = MISS;
+            hit_map[x][y] = MISS;
+            lastHit = false;
+            runLoop = false;
+        }
+        else{
+            cout<<"\nSomething went very wrong with the AI targeting system.\n";
+        }
+    }while(runLoop);
+}
+
+
 void ComputerPlayer::turn(Player &target)
 {
   //enum STATE{RAND, CHECK, FOLLOW, FOLLOW2};
@@ -216,5 +256,19 @@ void ComputerPlayer::advanceState(){
             
         default:
             break;
+    }
+}
+
+SliceAndDice::SliceAndDice(){
+    runLoop=true;
+    state=SLICE;
+    Point point;
+    for (int i=0; i<BOARDX; i++){
+        point.set(i,i);
+        hitlist.push(point);
+    }
+    for (int i=BOARDX-1; i>=0; i--){
+        point.set(i,i);
+        hitlist.push(point);
     }
 }

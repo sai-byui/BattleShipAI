@@ -1,10 +1,11 @@
 #ifndef BATTLE_SHIP_H
 #define BATTLE_SHIP_H
-
+#include <queue>
 #define BOARDX 8
 #define BOARDY 8
 enum SPACE_TYPE{BLANK, HIT, MISS, SHIP};
 enum STATE{RAND, CHECK, FOLLOW, FOLLOW2};
+enum SLICE_STATE{SLICE};
 
 class Player{
 private:
@@ -47,6 +48,17 @@ private:
     bool runLoop;
 public:
     ComputerPlayer(){lasty=lastx=0; state=RAND; runLoop=true;}
+    void turn(Player &target);
+};
+
+class SliceAndDice : public Player{
+private:
+    bool runLoop;
+    SLICE_STATE state;
+    std::queue<Point> hitlist;
+    
+public:
+    SliceAndDice();
     void turn(Player &target);
 };
 
