@@ -4,6 +4,7 @@
 #define BOARDX 8
 #define BOARDY 8
 enum SPACE_TYPE{BLANK, HIT, MISS, SHIP};
+enum STATE{RAND, CHECK, FOLLOW, FOLLOW2};
 
 class Player{
 private:
@@ -28,9 +29,24 @@ public:
     void turn(Player &target);
 };
 
+class Point {
+public:
+    Point(){x=y=0;}
+    void set(int x, int y) { this->x = x; this->y = y; }
+    
+    int x;
+    int y;
+};
+
 class ComputerPlayer : public Player{
 private:
+    void advanceState();
+    STATE state;
+    int lastx, lasty;
+    Point firstHit;
+    bool runLoop;
 public:
+    ComputerPlayer(){lasty=lastx=0; state=RAND; runLoop=true;}
     void turn(Player &target);
 };
 

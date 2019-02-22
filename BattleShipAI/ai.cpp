@@ -5,48 +5,75 @@
 #include <time.h>
 using namespace std;
 
-class Point {
-	public: 
-		void set(int x, int y) { this->x = x; this->y = y; }
-	
-	int x;
-	int y;
-};
-
 
 void ComputerPlayer::turn(Player &target)
 {
-  enum STATE{RAND, CHECK, FOLLOW, FOLLOW2};
+  //enum STATE{RAND, CHECK, FOLLOW, FOLLOW2};
   
-    static STATE state = RAND;
+    //static STATE state = RAND;
+    static bool lastHit = false;
+    runLoop = true;
   
-    static int lastx = 0;
+    /*static int lastx = 0;
     static int lasty = 0;
-    static int hitstreak = 0;
-	static Point firstHit;
+	static Point firstHit;*/
 
     
     int x,y;
     
     static int direction = -1;
     
+    // Check if we need to switch state
+    switch (state) {
+        case RAND:
+            if (lastHit){
+                state = CHECK;
+                firstHit.set(lastx, lasty);
+            }
+            break;
+        case CHECK:
+            if (lastHit)
+                state = FOLLOW;
+            break;
+        case FOLLOW:
+            if (!lastHit){
+                state = FOLLOW2;
+                direction = (direction + 2) % 4;
+                lastx = firstHit.x;
+                lasty = firstHit.y;
+            }
+            break;
+        case FOLLOW2:
+            if (!lastHit)
+                state = RAND;
+            break;
+        default:
+            break;
+    }
+    
+    
+    int count = 0;
     do
     {
+        count++;
+        if (count > 10000){
+            cout<<"We've looped over 10k times...\n";
+            cout<<"Current state: "<<(int)state<<endl;
+            cout<<"Last X: "<<lastx<<endl;
+            cout<<"Last Y: "<<lasty<<endl;
+            break;
+        }
         // AI code goes here
+        
+        
+        // Now execute behavior based on the state.
       switch (state)
         {
         case RAND:
             x = rand() % BOARDX; // Pick a random x
             y = rand() % BOARDY; // Pick a random y
-            if (target.map[x][y]==SHIP)
-            {
-                lastx = x;
-                lasty = y;
-
-				firstHit.set(x, y);
-
-                state = CHECK;
-            }
+            lastx = x;
+            lasty = y;
           break;
           
         case CHECK:
@@ -70,8 +97,6 @@ void ComputerPlayer::turn(Player &target)
                         y = lasty;
                         break;
                 }
-             if (target.map[x][y]==SHIP)
-               state = FOLLOW;
           break;
           
         case FOLLOW:
@@ -95,20 +120,27 @@ void ComputerPlayer::turn(Player &target)
                         break;
                 }
                 // This is so we don't keep going if the next spot in the grid is already marked
-                if (target.map[x][y]==MISS || target.map[x][y]==HIT){
+                /*if (target.map[x][y]==MISS || target.map[x][y]==HIT){
                     state = FOLLOW2;
                     continue;
+                }*/
+                /*if (target.map[x][y]==BLANK){
+                    direction = (direction + 2) % 4;
+                    state = FOLLOW2;
+                }*/
+                // In case we target off the edge of the board
+                if (x < 0 || x >= BOARDX || y < 0 || y >= BOARDY)
+                {
+                    state = FOLLOW2;
+                    direction = (direction + 2) % 4;
+                    lastx = firstHit.x;
+                    lasty = firstHit.y;
+                    continue;
                 }
-           if (target.map[x][y]==BLANK)
-             state = FOLLOW2;
           break;
 
 		case FOLLOW2:
-			direction = (direction + 2) % 4;
-			lastx = firstHit.x;
-			lasty = firstHit.y;
-
-			switch (direction)
+            switch (direction)
 			{
 			case 0: // south
 				x = lastx;
@@ -127,14 +159,20 @@ void ComputerPlayer::turn(Player &target)
 				y = lasty;
 				break;
 			}
+            // In case we target off the edge of the board
+            if (x < 0 || x >= BOARDX || y < 0 || y >= BOARDY)
+            {
+                state = RAND;
+                continue;
+            }
+			// If we've already hit there before.
 			if (target.map[x][y]==MISS || target.map[x][y]==HIT){
                     state = RAND;
                     continue;
                 }
 
-			if (target.map[x][y] == BLANK)
-				state = RAND;
-
+			/*if (target.map[x][y] == BLANK)
+				state = RAND;*/
 			break;
         }
         
@@ -144,23 +182,39 @@ void ComputerPlayer::turn(Player &target)
         // End AI code
         
         // Message the user with the results of your shot
+        //cout<<"Testing the shot...\n";
         if (target.map[x][y] == HIT || target.map[x][y] == MISS) {continue;}
         else if (target.map[x][y] == SHIP)
         {
-            cout<<"\nThe computer hit your battleship! ("<<x+1<<','<<y+1<<")\n";
+            cout<<"\nThe computer hit your battleship! ("<<x<<','<<y<<")\n";
             target.map[x][y] = HIT;
             hit_map[x][y] = HIT;
-            break;
+            lastHit = true;
+            runLoop = false;
         }
         else if (target.map[x][y] == BLANK)
         {
-            cout<<"\nThe computer missed! ("<<x+1<<','<<y+1<<")\n";
+            cout<<"\nThe computer missed! ("<<x<<','<<y<<")\n";
             target.map[x][y] = MISS;
             hit_map[x][y] = MISS;
-            break;
+            lastHit = false;
+            runLoop = false;
         }
         else{
             cout<<"\nSomething went very wrong with the AI targeting system.\n";
         }
-    }while (target.map[x][y] != BLANK);
+        //cout<<"You should have recieved a message by now\n";
+    }while (runLoop);
+    //cout<<"Exiting the loop x="<<x<<"   y="<<y<<"  state: "<<(int)state<<"\n";
+}
+
+
+void ComputerPlayer::advanceState(){
+    switch (state) {
+        case RAND:
+            break;
+            
+        default:
+            break;
+    }
 }
