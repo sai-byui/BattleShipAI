@@ -17,6 +17,11 @@ void SliceAndDice::turn(Player &target){
             x = hitlist.front().x;
             y = hitlist.front().y;
             hitlist.pop();
+            cout<<"Popped an Point("<<x<<", "<<y<<")\n";
+        }
+        else{
+            x = rand() % BOARDX;
+            y = rand() % BOARDY;
         }
         
         // Check for valid
@@ -268,7 +273,7 @@ SliceAndDice::SliceAndDice(){
         hitlist.push(point);
     }
     for (int i=BOARDX-1; i>=0; i--){
-        point.set(i,i);
+        point.set(i,(BOARDY-i)-1);
         hitlist.push(point);
     }
 }
